@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ljh.mapper.StudentMapper">
+    <select id="selBySnameTname" resultType="com.ljh.pojo.Student">
+        select * from student
+        <where>
+        <if test="sname!=null">
+            and s_name=#{sname}
+        </if>
+        <if test="id!=0">
+            and tid=#{id}
+        </if>
+        </where>
+
+    </select>
+
+    <select id="selCount" resultType="long" parameterType="com.ljh.pojo.PageInfo">
+        select count(*) from student
+        <where>
+            <if test="s_name!=null and sname!=''">
+                <bind name="s_name" value="'%'+s_name+'%'"/>
+                and name like=#{sname}
+            </if>
+            <if test="t_name!=null and t_name!=''">
+                <bind name="t_name" value="'%'+t_name+'%'"/>
+                and tid in(select id from teacher where name like #{t_name})
+            </if>
+        </where>
+    </select>
+    <select id="selByPage" parameterType="com.ljh.pojo.PageInfo" resultType="com.ljh.pojo.Student">
+        select * from student
+        <where>
+            <if test="s_name!=null and s_name!=''">
+                <bind name="s_name" value="'%'+s_name+'%'"></bind>
+                and name=#{sname}
+            </if>
+            <if test="t_name!=null and t_name!=''">
+                <bind name="t_name" value="'%'+t_name+'%'"></bind>
+                and tid in (select id from teacher where t_name=#{tname})
+            </if>
+        </where>
+        limit #{pageStart},#{pageSize}
+    </select>
+        <!--查询共有多少页-->
+    <select id="selCountByPageInfo" parameterType="com.ljh.pojo.PageInfo" resultType="long">
+        select count(*) from student
+        <where>
+            <if test="s_name!=null and s_name!=''">
+                <bind name="s_name" value="'%'+s_name+'%'"></bind>
+                and name=#{sname}
+            </if>
+            <if test="t_name!=null and t_name!=''">
+                <bind name="t_name" value="'%'+t_name+'%'"></bind>
+                and tid in (select id from teacher where t_name=#{tname})
+            </if>
+        </where>
+    </select>
+
+    <resultMap id="mymapper" type="com.ljh.pojo.student">
+        <id column="id" property="id"/>
+        <result column="s_name" property="s_name"/>
+        <result column="s_age" property="s_age"/>
+        <result column="tid" property="tid"/>
+    </resultMap>
+    <select id="selAll" resultMap="mymapper">
+        select * from student
+    </select>
+</mapper>
